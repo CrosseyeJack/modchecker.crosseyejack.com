@@ -1,1 +1,1 @@
-The node backend server which will check if the passed username is a mod of the passed along channel.
+The node backend service which will check if the passed username is a mod of the passed along twitch channel.
