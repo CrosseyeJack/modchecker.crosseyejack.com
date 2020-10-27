@@ -1,0 +1,1 @@
+The node backend server which will check if the passed username is a mod of the passed along channel.
