@@ -6,6 +6,7 @@ const webServer = require("./app/webserver");
 
 // Varibles
 let debug = false, // Spits out debug Messsages
+  port = 4521,
   Settings = {
     // The default settings
     twitchChatAuth: "", // Keep this out of the source
@@ -59,13 +60,17 @@ const entryPoint = async () => {
     });
   }
 
+  if ("port" in Settings) {
+    port = Settings.port;
+  }
+
   if (!Settings.twitchChatAuth) {
     console.error(`(ERROR) twitchChatAuth missing from settings file.`);
     process.exit(1);
   }
 
   twitchChat.startChat(Settings.twitchChatAuth, debug);
-  await webServer.init("localhost", 4521, debug).catch((error) => {
+  await webServer.init("localhost", port, debug).catch((error) => {
     console.error(error);
     process.exit(1);
   });
