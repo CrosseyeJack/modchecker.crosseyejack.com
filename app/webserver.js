@@ -1,11 +1,14 @@
 "use strict";
 const express = require("express");
 const WebSocket = require("ws");
+const twitchChat = require("./twitchWebsocket");
 const app = express();
 
-const twitchChat = require("./twitchWebsocket");
-
-const twitchUsernameRegex = /^([a-z0-9_]{4,25})$/i;
+const twitchUsernameRegex = /^([a-z0-9_]{4,25})$/i,
+  noCacheString = "private, max-age=0, no-cache",
+  cacheString = "public, min-fresh=60, max-age=3600, must-revalidate",
+  contentTypeString = "application/json",
+  queryTimeout = 500;
 
 app.use(express.json());
 app.get("/:channel", (req, res) => handleChannelMods(req, res)); // return all the mods of a channel.
@@ -14,8 +17,8 @@ app.get("/:channel/:user", (req, res) => handleChannelModsCheck(req, res)); // r
 const handleChannelMods = (req, res) => {
   if (!("channel" in req.params)) {
     res.writeHead(500, {
-      "Content-Type": "application/json",
-      "Cache-Control": "private, max-age=0, no-cache",
+      "Content-Type": contentTypeString,
+      "Cache-Control": noCacheString,
     });
     res.end(
       JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
@@ -28,8 +31,8 @@ const handleChannelMods = (req, res) => {
   // Simple username validation check
   if (!channelName.match(twitchUsernameRegex)) {
     res.writeHead(500, {
-      "Content-Type": "application/json",
-      "Cache-Control": "private, max-age=0, no-cache",
+      "Content-Type": contentTypeString,
+      "Cache-Control": noCacheString,
     });
     res.end(
       JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
@@ -40,16 +43,16 @@ const handleChannelMods = (req, res) => {
   getMods(channelName)
     .then((modList) => {
       res.writeHead(200, {
-        "Content-Type": "application/json",
-        "Cache-Control": "public, min-fresh=60, max-age=3600, must-revalidate",
+        "Content-Type": contentTypeString,
+        "Cache-Control": cacheString,
       });
       res.end(JSON.stringify(modList));
       return;
     })
     .catch((error) => {
       res.writeHead(500, {
-        "Content-Type": "application/json",
-        "Cache-Control": "private, max-age=0, no-cache",
+        "Content-Type": contentTypeString,
+        "Cache-Control": noCacheString,
       });
       res.end(
         JSON.stringify({
@@ -65,8 +68,8 @@ const handleChannelMods = (req, res) => {
 const handleChannelModsCheck = (req, res) => {
   if (!("channel" in req.params) || !("user" in req.params)) {
     res.writeHead(500, {
-      "Content-Type": "application/json",
-      "Cache-Control": "private, max-age=0, no-cache",
+      "Content-Type": contentTypeString,
+      "Cache-Control": noCacheString,
     });
     res.end(
       JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
@@ -83,8 +86,8 @@ const handleChannelModsCheck = (req, res) => {
     !user.match(twitchUsernameRegex)
   ) {
     res.writeHead(500, {
-      "Content-Type": "application/json",
-      "Cache-Control": "private, max-age=0, no-cache",
+      "Content-Type": contentTypeString,
+      "Cache-Control": noCacheString,
     });
     res.end(
       JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
@@ -96,23 +99,21 @@ const handleChannelModsCheck = (req, res) => {
     .then((modList) => {
       if (modList.includes(user))
         res.writeHead(200, {
-          "Content-Type": "application/json",
-          "Cache-Control":
-            "public, min-fresh=60, max-age=3600, must-revalidate",
+          "Content-Type": contentTypeString,
+          "Cache-Control": cacheString,
         });
       else
         res.writeHead(404, {
-          "Content-Type": "application/json",
-          "Cache-Control":
-            "public, min-fresh=60, max-age=3600, must-revalidate",
+          "Content-Type": contentTypeString,
+          "Cache-Control": cacheString,
         });
       res.end(JSON.stringify(modList));
       return;
     })
     .catch((error) => {
       res.writeHead(500, {
-        "Content-Type": "application/json",
-        "Cache-Control": "private, max-age=0, no-cache",
+        "Content-Type": contentTypeString,
+        "Cache-Control": noCacheString,
       });
       res.end(
         JSON.stringify({
@@ -130,7 +131,7 @@ const getMods = (channelName) => {
       timeoutObj = setTimeout(() => {
         ws.removeEventListener("message", messageProcessor);
         reject();
-      }, 2500);
+      }, queryTimeout);
 
     const messageProcessor = (data) => {
       data.split(/\r?\n/).forEach((line) => {
@@ -181,7 +182,7 @@ const getMods = (channelName) => {
 };
 
 module.exports = {
-  init: (host, port, debug) => {
+  init: (host, port) => {
     return new Promise((resolve, reject) => {
       try {
         app.listen(port, host, () => {

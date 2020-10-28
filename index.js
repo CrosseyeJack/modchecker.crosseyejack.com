@@ -69,7 +69,7 @@ const entryPoint = async () => {
   }
 
   twitchChat.startChat(Settings.twitchChatAuth, debug);
-  await webServer.init("localhost", port, debug).catch((error) => {
+  await webServer.init("localhost", port).catch((error) => {
     console.error(error);
     process.exit(1);
   });
