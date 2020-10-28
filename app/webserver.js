@@ -23,7 +23,7 @@ const handleChannelMods = (req, res) => {
     return;
   }
 
-  let channelName = req.params.channel;
+  let channelName = req.params.channel.toLowerCase();
 
   // Simple username validation check
   if (!channelName.match(twitchUsernameRegex)) {
