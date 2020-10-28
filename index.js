@@ -1,16 +1,13 @@
 "use strict";
 const fs = require("fs");
 const prompt = require("prompt-async");
-
 const twitchChat = require("./app/twitchWebsocket");
-const twitchAPI = require("./app/twitchAPI");
 
 // Varibles
 let debug = true, // Spits out debug Messsages
   Settings = {
     // The default settings
-    twitchChatAuth: "", // Keep these out of the source
-    twitchClientID: "",
+    twitchChatAuth: "", // Keep this out of the source
   };
 // Constants
 const settingsFileName = "./settings.json";
@@ -66,34 +63,6 @@ const entryPoint = async () => {
     saveSettings();
   }
 
-  if (!Settings.twitchClientID) {
-    prompt.start();
-    while (true) {
-      console.log(
-        `Twitch Client ID is empty, please enter it now (or adjust settings.json and relaunch this application)`
-      );
-      let { clientID } = await prompt.get(["clientID"]);
-      // TODO Do a simple validation on the auth string here
-      if (clientID) {
-        // Set the settings object
-        Settings.twitchClientID = clientID;
-        break; // Break out of the while loop.
-      }
-    }
-    prompt.stop();
-    // Save the settings object
-    saveSettings();
-  }
-
-  initTwitchAPI(Settings);
-  var twitchUser = await validateTwitchToken(Settings.twitchChatAuth);
-  if (!twitchUser) {
-    console.error(
-      "(ERROR) Unable to validate Twitch Chat Auth. Please validate it and try again."
-    );
-    process.exit(1);
-  }
-
   startTwitchChatConnection();
   if (debug) console.log(`(DEBUG) End of entryPoint()`);
 };
@@ -101,17 +70,6 @@ const entryPoint = async () => {
 const startTwitchChatConnection = () => {
   console.log("Hit up twitch with our demands...");
   twitchChat.startChat(Settings);
-};
-
-const validateTwitchToken = async (token) => {
-  var username = await twitchAPI.validateToken(token);
-  if (username === null || username === undefined) return false;
-  Settings.twitchChatUsername = username;
-  return username;
-};
-
-const initTwitchAPI = (settings) => {
-  twitchAPI.initTwitchAPI(settings);
 };
 
 const saveSettings = () => {
