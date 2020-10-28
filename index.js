@@ -1,10 +1,11 @@
 "use strict";
+const Sentry = require("@sentry/node");
 const fs = require("fs");
 const twitchChat = require("./app/twitchWebsocket");
 const webServer = require("./app/webserver");
 
 // Varibles
-let debug = true, // Spits out debug Messsages
+let debug = false, // Spits out debug Messsages
   Settings = {
     // The default settings
     twitchChatAuth: "", // Keep this out of the source
@@ -41,6 +42,21 @@ const entryPoint = async () => {
       `(ERROR) Unable to parse settings file. This is prob cause there is bad json in it. Check the file and relaunch.`
     );
     process.exit(1);
+  }
+
+  if ("debug" in Settings) {
+    debug = Settings.debug;
+  }
+
+  if ("sentry" in Settings) {
+    if (debug) console.log("Init Sentry!");
+    Sentry.init({
+      dsn: Settings.sentry,
+
+      // We recommend adjusting this value in production, or using tracesSampler
+      // for finer control
+      tracesSampleRate: 1.0,
+    });
   }
 
   if (!Settings.twitchChatAuth) {
