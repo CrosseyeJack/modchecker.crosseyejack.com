@@ -64,7 +64,6 @@ const handleChannelMods = (req, res) => {
     });
 };
 
-// FIXME Prob gonna rewrite this to cut down on the reused code.
 const handleChannelModsCheck = (req, res) => {
   if (!("channel" in req.params) || !("user" in req.params)) {
     res.writeHead(500, {
