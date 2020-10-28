@@ -1,6 +1,7 @@
 "use strict";
 const fs = require("fs");
 const twitchChat = require("./app/twitchWebsocket");
+const webServer = require("./app/webserver");
 
 // Varibles
 let debug = true, // Spits out debug Messsages
@@ -43,13 +44,15 @@ const entryPoint = async () => {
   }
 
   if (!Settings.twitchChatAuth) {
-    console.error(
-      `(ERROR) Unable to parse settings file. This is prob cause there is bad json in it. Check the file and relaunch.`
-    );
+    console.error(`(ERROR) twitchChatAuth missing from settings file.`);
     process.exit(1);
   }
 
-  twitchChat.startChat(Settings);
+  twitchChat.startChat(Settings.twitchChatAuth, debug);
+  await webServer.init("localhost", 4521, debug).catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 };
 
 const saveSettings = () => {
