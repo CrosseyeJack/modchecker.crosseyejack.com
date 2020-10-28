@@ -45,26 +45,25 @@ const entryPoint = async () => {
     process.exit(1);
   }
 
-  if ("debug" in Settings) {
+  if ("debug" in Settings && Settings.debug === "boolean") {
     debug = Settings.debug;
   }
 
   if ("sentry" in Settings) {
-    if (debug) console.log("Init Sentry!");
-    Sentry.init({
-      dsn: Settings.sentry,
-
-      // We recommend adjusting this value in production, or using tracesSampler
-      // for finer control
-      tracesSampleRate: 1.0,
-    });
+    if (Settings.sentry && typeof Settings.sentry === "string") {
+      if (debug) console.log("Init Sentry!");
+      Sentry.init({
+        dsn: Settings.sentry,
+        tracesSampleRate: 1.0,
+      });
+    }
   }
 
-  if ("port" in Settings) {
+  if ("port" in Settings && typeof Settings.port === "number") {
     port = Settings.port;
   }
 
-  if (!Settings.twitchChatAuth) {
+  if (!Settings.twitchChatAuth || typeof Settings.sentry !== "string") {
     console.error(`(ERROR) twitchChatAuth missing from settings file.`);
     process.exit(1);
   }
