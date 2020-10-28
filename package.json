@@ -20,7 +20,6 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
-    "prompt-async": "^0.9.9",
     "websocket": "^1.0.32",
     "ws": "^7.3.1"
   }

@@ -1,6 +1,5 @@
 "use strict";
 const fs = require("fs");
-const prompt = require("prompt-async");
 const twitchChat = require("./app/twitchWebsocket");
 
 // Varibles
@@ -15,7 +14,6 @@ const settingsFileName = "./settings.json";
 // Entry Point for the application
 const entryPoint = async () => {
   if (debug) process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Dev env doesn't like the twitch SSL Cert. I prob need to kick the cert package up the arse. But for deving I'm just bypassing the check :-P
-  if (debug) console.log(`(DEBUG) Start of entryPoint()`);
   console.log("Twitch Mod Checker.");
 
   // A simple sanity check...
@@ -45,35 +43,16 @@ const entryPoint = async () => {
   }
 
   if (!Settings.twitchChatAuth) {
-    prompt.start();
-    while (true) {
-      console.log(
-        `Twitch Chat Auth is empty, please enter it now (or adjust settings.json and relaunch this application)`
-      );
-      let { chatAuth } = await prompt.get(["chatAuth"]);
-      // TODO Do a simple validation on the auth string here
-      if (chatAuth) {
-        // Set the settings object
-        Settings.twitchChatAuth = chatAuth;
-        break; // Break out of the while loop.
-      }
-    }
-    prompt.stop();
-    // Save the settings object
-    saveSettings();
+    console.error(
+      `(ERROR) Unable to parse settings file. This is prob cause there is bad json in it. Check the file and relaunch.`
+    );
+    process.exit(1);
   }
 
-  startTwitchChatConnection();
-  if (debug) console.log(`(DEBUG) End of entryPoint()`);
-};
-
-const startTwitchChatConnection = () => {
-  console.log("Hit up twitch with our demands...");
   twitchChat.startChat(Settings);
 };
 
 const saveSettings = () => {
-  if (debug) console.log(`(DEBUG) Writting out settings file.`);
   try {
     fs.writeFileSync(settingsFileName, JSON.stringify(Settings, null, 2));
   } catch (err) {

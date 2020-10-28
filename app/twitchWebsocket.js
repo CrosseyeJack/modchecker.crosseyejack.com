@@ -1,6 +1,5 @@
 const WebSocket = require("ws");
-const ws = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
-
+let ws = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
 let chatAuth, pingTimer;
 
 const stopPingTimer = () => {
@@ -27,9 +26,8 @@ exports.startChat = async (Settings) => {
     if (!chatAuth.startsWith("oauth:")) {
       chatAuth = `oauth:${chatAuth}`;
     }
-    // sendMessage(`PASS ${chatAuth}`);
     sendMessage(`PASS ${chatAuth}`);
-    sendMessage(`NICK fakeuser`);
+    sendMessage(`NICK fakeuser`); // We don't actually need to send the correct username for the tmi oauth, just "something".
   });
 
   // TODO on WS Close - attempt to reconenct.
@@ -51,3 +49,6 @@ exports.startChat = async (Settings) => {
     });
   });
 };
+
+exports.ws = ws;
+exports.sendMessage = sendMessage;
