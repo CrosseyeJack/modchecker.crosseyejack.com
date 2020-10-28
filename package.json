@@ -1,6 +1,6 @@
 {
   "name": "modchecker",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "use twitch chat to check if a username is a mod of a channel.",
   "main": "index.js",
   "scripts": {
