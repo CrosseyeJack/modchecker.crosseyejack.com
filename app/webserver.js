@@ -15,6 +15,22 @@ const handleChannelModsCheck = (req, res) => {
     const channelName = req.params.channel.toLowerCase(),
       user = req.params.user.toLowerCase(),
       ws = twitchChat.ws();
+
+    // Simple username validation check
+    if (
+      !channelName.match(/^([a-z0-9_]{4,25})$/i) ||
+      !user.match(/^([a-z0-9_]{4,25})$/i)
+    ) {
+      res.writeHead(500, {
+        "Content-Type": "application/json",
+        "Cache-Control": "private, max-age=0, no-cache",
+      });
+      res.end(
+        JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
+      );
+      return;
+    }
+
     if (ws.readyState !== WebSocket.OPEN) {
       res.writeHead(503, { "Content-Type": "application/json" });
       res.end(
@@ -97,7 +113,9 @@ const handleChannelModsCheck = (req, res) => {
       "Content-Type": "application/json",
       "Cache-Control": "private, max-age=0, no-cache",
     });
-    res.end(JSON.stringify({ error: "Params", errormsg: "Params Not Found." }));
+    res.end(
+      JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
+    );
     return;
   }
 };
@@ -105,6 +123,19 @@ const handleChannelModsCheck = (req, res) => {
 const handleChannelMods = (req, res) => {
   if ("channel" in req.params) {
     let channelName = req.params.channel;
+
+    // Simple username validation check
+    if (!channelName.match(/^([a-z0-9_]{4,25})$/i)) {
+      res.writeHead(500, {
+        "Content-Type": "application/json",
+        "Cache-Control": "private, max-age=0, no-cache",
+      });
+      res.end(
+        JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
+      );
+      return;
+    }
+
     const ws = twitchChat.ws();
     if (ws.readyState !== WebSocket.OPEN) {
       res.writeHead(503, { "Content-Type": "application/json" });
@@ -181,7 +212,9 @@ const handleChannelMods = (req, res) => {
       "Content-Type": "application/json",
       "Cache-Control": "private, max-age=0, no-cache",
     });
-    res.end(JSON.stringify({ error: "Params", errormsg: "Params Not Found." }));
+    res.end(
+      JSON.stringify({ error: "params", errormsg: "Invalid parameters." })
+    );
     return;
   }
 };
