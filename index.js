@@ -11,8 +11,6 @@ let debug = true, // Spits out debug Messsages
     // The default settings
     twitchChatAuth: "", // Keep these out of the source
     twitchClientID: "",
-    twitchClientSecret: "",
-    channels: [],
   };
 // Constants
 const settingsFileName = "./settings.json";
@@ -87,25 +85,6 @@ const entryPoint = async () => {
     saveSettings();
   }
 
-  if (!Settings.twitchClientSecret) {
-    prompt.start();
-    while (true) {
-      console.log(
-        `Twitch Client Secret is empty, please enter it now (or adjust settings.json and relaunch this application)`
-      );
-      let { clientSecret } = await prompt.get(["clientSecret"]);
-      // TODO Do a simple validation on the auth string here
-      if (clientSecret) {
-        // Set the settings object
-        Settings.twitchClientSecret = clientSecret;
-        break; // Break out of the while loop.
-      }
-    }
-    prompt.stop();
-    // Save the settings object
-    saveSettings();
-  }
-
   initTwitchAPI(Settings);
   var twitchUser = await validateTwitchToken(Settings.twitchChatAuth);
   if (!twitchUser) {
@@ -132,8 +111,7 @@ const validateTwitchToken = async (token) => {
 };
 
 const initTwitchAPI = (settings) => {
-  twitchAPI.setClientid(settings.twitchClientID);
-  twitchAPI.setClientsecret(settings.twitchClientSecret);
+  twitchAPI.initTwitchAPI(settings);
 };
 
 const saveSettings = () => {

@@ -1,11 +1,7 @@
 const WebSocket = require("ws");
 const ws = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
 
-let chatAuth,
-  chatUser,
-  channelsToJoin = [],
-  joinedChannels = [],
-  pingTimer;
+let chatAuth, chatUser, pingTimer;
 
 const stopPingTimer = () => {
   clearInterval(pingTimer);
@@ -18,19 +14,13 @@ const startPingTimer = () => {
   }, 5 * 60 * 1000);
 };
 
-const joinChannels = (channels) => {
-  channelsToJoin = channels;
-  setInterval(() => {
-    if (channelsToJoin.length >= 1) {
-      let channelName = channelsToJoin.shift().toLowerCase();
-      if (!channelName.startsWith("#")) channelName = `#${channelName}`;
-      ws.send(`JOIN ${channelName}`);
-    }
-  }, 100);
+// Function to send a message to twitch, I'm going to put in some kind of message queue in here but for now just send the message to tmi.
+const sendMessage = (message) => {
+  console.log(`< ${message}`);
+  ws.send(message);
 };
 
 exports.startChat = async (Settings) => {
-  console.log(Settings);
   chatAuth = Settings.twitchChatAuth;
   chatUser = Settings.twitchChatUsername;
 
@@ -42,24 +32,23 @@ exports.startChat = async (Settings) => {
     ws.send(`NICK ${chatUser}`);
   });
 
+  // TODO on WS Close - attempt to reconenct.
+
   ws.on("message", function incoming(data) {
     data.split(/\r?\n/).forEach((line) => {
-      console.log(`> ${line}`);
+      if (line.length === 0) return;
       switch (line) {
         case `:tmi.twitch.tv 376 ${chatUser} :>`:
           console.log("Connected to Chat");
+          sendMessage("CAP REQ :twitch.tv/commands");
           startPingTimer();
-          joinChannels(Settings.channels);
           break;
 
         case "PING :tmi.twitch.tv":
           ws.send("PONG :tmi.twitch.tv");
           break;
-
-        // TODO Catch this expression
-        // :jacks_mod_checker_bot.tmi.twitch.tv 353 jacks_mod_checker_bot = #itmejp :jacks_mod_checker_bot
-        // :<botusername>.tmi.twitch.tv 353 <botusername> = <#channelJoined> :<botusername>
       }
+      console.log(`> ${line}`);
     });
   });
 };

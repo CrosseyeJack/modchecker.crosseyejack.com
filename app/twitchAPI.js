@@ -1,8 +1,6 @@
-const { rejects } = require("assert");
 const https = require("https");
 
-let clientid = "",
-  clientsecret = "";
+let clientid = "";
 
 const validateToken = async (token) => {
   if (token.startsWith("oauth:")) token = token.replace("oauth:", "");
@@ -18,7 +16,7 @@ const validateToken = async (token) => {
 const getUserFromToken = async (token) => {
   // This is using the old v5 API to fetch the username for the auth token used. IIRC the last time I check the "New Twitch API" didn't have such a feature, but I might be mistaken or they might of actualy added it since I last check
   // TODO Check the twitch docs. I would rather not use the old API if I didn't have to.
-  // How ever this call might not even be needed. I should be able to fake the USER string and get the real username from tmi on connection.
+  // However this call might not even be needed. I should be able to fake the USER string and get the real username from tmi on connection.
   return new Promise((resolve, reject) => {
     https
       .get(
@@ -70,10 +68,8 @@ const getUserFromToken = async (token) => {
   });
 };
 
+exports.initTwitchAPI = (settings) => {
+  this.clientid = settings.setClientid;
+};
+
 exports.validateToken = validateToken;
-exports.setClientid = (clientid) => {
-  this.clientid = clientid;
-};
-exports.setClientsecret = (clientsecret) => {
-  this.clientsecret = clientsecret;
-};
