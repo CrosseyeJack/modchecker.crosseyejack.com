@@ -57,7 +57,8 @@ const handleChannelMods = (req, res) => {
       res.end(
         JSON.stringify({
           error: "twitch",
-          errormsg: "Unable to communicate with Twitch. Try again later.",
+          errormsg:
+            "Unable to communicate with Twitch. Try again later. Please double check the channel name. I'm too lazy to query twitch to make sure it actually exists ;-)",
         })
       );
       return;
@@ -117,7 +118,8 @@ const handleChannelModsCheck = (req, res) => {
       res.end(
         JSON.stringify({
           error: "twitch",
-          errormsg: "Unable to communicate with Twitch. Try again later.",
+          errormsg:
+            "Unable to communicate with Twitch. Try again later. Please double check the channel name. I'm too lazy to query twitch to make sure it actually exists ;-)",
         })
       );
       return;
