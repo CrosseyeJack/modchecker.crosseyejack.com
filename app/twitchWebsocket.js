@@ -1,8 +1,6 @@
 "use strict";
 const WebSocket = require("ws");
-let debug = false,
-  ws,
-  chatAuth,
+let ws,
   chatUser,
   pingTimer,
   listenForPingTimer,
@@ -47,8 +45,7 @@ const setLastPing = () => {
   lastPing = Math.floor(Date.now() / 1000);
 };
 
-const startChat = async (debugFlag) => {
-  debug = debugFlag;
+const startChat = async () => {
   ws = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
   ws.on("open", () => {
     sendMessage(`PASS blahblahblah`);
@@ -62,7 +59,7 @@ const startChat = async (debugFlag) => {
     console.log("Disconnected from chat, reconnecting.");
     stopPingTimer();
     setTimeout(() => {
-      startChat(debug);
+      startChat();
     }, 500);
   });
 
