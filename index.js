@@ -63,12 +63,7 @@ const entryPoint = async () => {
     port = Settings.port;
   }
 
-  if (!Settings.twitchChatAuth || typeof Settings.sentry !== "string") {
-    console.error(`(ERROR) twitchChatAuth missing from settings file.`);
-    process.exit(1);
-  }
-
-  twitchChat.startChat(Settings.twitchChatAuth, debug);
+  twitchChat.startChat(debug);
   await webServer.init("localhost", port).catch((error) => {
     console.error(error);
     process.exit(1);

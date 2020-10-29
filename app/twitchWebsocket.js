@@ -47,18 +47,14 @@ const setLastPing = () => {
   lastPing = Math.floor(Date.now() / 1000);
 };
 
-const startChat = async (twitchChatAuth, debugFlag) => {
-  chatAuth = twitchChatAuth;
+const startChat = async (debugFlag) => {
   debug = debugFlag;
   ws = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
   ws.on("open", () => {
-    if (!chatAuth.startsWith("oauth:")) {
-      chatAuth = `oauth:${chatAuth}`;
-    }
-    sendMessage(`PASS ${chatAuth}`);
-    // We don't actually need to send the correct
-    // username for the tmi oauth, just "something".
-    sendMessage(`NICK fakeuser`);
+    sendMessage(`PASS blahblahblah`);
+    sendMessage(
+      `NICK justinfan${Math.floor(100000 + Math.floor(Math.random() * 899999))}`
+    );
   });
 
   // TODO on WS Close - attempt to reconenct.
@@ -66,7 +62,7 @@ const startChat = async (twitchChatAuth, debugFlag) => {
     console.log("Disconnected from chat, reconnecting.");
     stopPingTimer();
     setTimeout(() => {
-      startChat(chatAuth, debug);
+      startChat(debug);
     }, 500);
   });
 
