@@ -1,5 +1,6 @@
 "use strict";
 const express = require("express");
+const cors = require("cors");
 const WebSocket = require("ws");
 const twitchChat = require("./twitchWebsocket");
 const app = express();
@@ -10,7 +11,9 @@ const twitchUsernameRegex = /^([a-z0-9_]{4,25})$/i,
   contentTypeString = "application/json",
   queryTimeout = 500;
 
+app.use(cors());
 app.use(express.json());
+
 app.get("/", (req, res) => {
   res
     .status(302)
