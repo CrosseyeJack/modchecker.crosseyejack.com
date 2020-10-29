@@ -11,6 +11,12 @@ const twitchUsernameRegex = /^([a-z0-9_]{4,25})$/i,
   queryTimeout = 500;
 
 app.use(express.json());
+app.get("/", (req, res) => {
+  res
+    .status(302)
+    .redirect("https://github.com/CrosseyeJack/modchecker.crosseyejack.com/");
+  return;
+});
 app.get("/:channel", (req, res) => handleChannelMods(req, res)); // return all the mods of a channel.
 app.get("/:channel/:user", (req, res) => handleChannelModsCheck(req, res)); // return a simple yes/no of :user is a mod of :channel
 
