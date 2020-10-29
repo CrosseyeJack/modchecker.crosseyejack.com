@@ -63,7 +63,7 @@ const entryPoint = async () => {
     port = Settings.port;
   }
 
-  if (!Settings.twitchChatAuth || typeof Settings.sentry !== "string") {
+  if (!Settings.twitchChatAuth || typeof Settings.twitchChatAuth !== "string") {
     console.error(`(ERROR) twitchChatAuth missing from settings file.`);
     process.exit(1);
   }
